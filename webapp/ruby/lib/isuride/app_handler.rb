@@ -399,12 +399,9 @@ module Isuride
         end
 
       response = db_transaction do |tx|
-        chairs = tx.query('SELECT id, name, model, is_active  FROM chairs')
+        chairs = tx.query('SELECT id, name, model, is_active  FROM chairs WHERE is_active = true')
 
         nearby_chairs = chairs.filter_map do |chair|
-          unless chair.fetch(:is_active)
-            next
-          end
 
           rides = tx.xquery('SELECT * FROM rides WHERE chair_id = ? ORDER BY created_at DESC LIMIT 1', chair.fetch(:id))
 
@@ -440,11 +437,11 @@ module Isuride
           end
         end
 
-        retrieved_at = Time.now.utc
+        retrieved_at = Time.now
 
         {
           chairs: nearby_chairs,
-          retrieved_at: retrieved_at.strftime('%Y-%m-%d %H:%M:%S.%6N') # ミリ秒精度
+          retrieved_at: time_msec(retrieved_at),
         }
       end
 
