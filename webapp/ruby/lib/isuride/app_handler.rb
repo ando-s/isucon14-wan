@@ -399,7 +399,7 @@ module Isuride
         end
 
       response = db_transaction do |tx|
-        chairs = tx.query('SELECT * FROM chairs')
+        chairs = tx.query('SELECT id, name, model, is_active  FROM chairs')
 
         nearby_chairs = chairs.filter_map do |chair|
           unless chair.fetch(:is_active)
