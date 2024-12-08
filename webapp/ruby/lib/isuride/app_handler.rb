@@ -457,8 +457,16 @@ module Isuride
 
         total_rides_count = 0
         total_evaluation = 0.0
+
+        # ride_statuses を ride_id で一括取得し、ハッシュでグループ化
+        ride_ids = rides.map { |ride| ride.fetch(:id) }
+        ride_statuses_all = tx.xquery('SELECT * FROM ride_statuses WHERE ride_id IN (?) ORDER BY created_at', ride_ids)
+
+        ride_statuses_by_ride_id = ride_statuses_all.group_by { |status| status.fetch(:ride_id) }
+
         rides.each do |ride|
-          ride_statuses = tx.xquery('SELECT * FROM ride_statuses WHERE ride_id = ? ORDER BY created_at', ride.fetch(:id))
+          #ride_statuses = tx.xquery('SELECT * FROM ride_statuses WHERE ride_id = ? ORDER BY created_at', ride.fetch(:id))
+          ride_statuses = ride_statuses_by_ride_id[ride.fetch(:id)] || []
 
           arrived_at = nil
           pickup_at = nil
