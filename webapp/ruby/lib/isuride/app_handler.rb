@@ -440,11 +440,11 @@ module Isuride
           end
         end
 
-        retrieved_at = tx.query('SELECT CURRENT_TIMESTAMP(6)', as: :array).first[0]
+        retrieved_at = Time.now.utc
 
         {
           chairs: nearby_chairs,
-          retrieved_at: time_msec(retrieved_at),
+          retrieved_at: retrieved_at.strftime('%Y-%m-%d %H:%M:%S.%6N') # ミリ秒精度
         }
       end
 
